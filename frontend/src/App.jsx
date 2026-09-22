@@ -167,79 +167,25 @@ function App() {
     const [selectedCategory, setSelectedCategory] = useState("ALL");
     const [smartRecommendations, setSmartRecommendations] = useState([]);
 
-  const handleAssistantQuery = (userQuery) => {
-  const query = userQuery.toLowerCase();
+  const handleAssistantQuery = async (userQuery) => {
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/assistant", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: userQuery,
+      }),
+    });
 
-  let maxPrice = null;
-  let category = null;
-  let subcategory = null;
-  let dietaryPreference = null;
-  let avoidAllergens = [];
+    const data = await response.json();
 
-  // Budget
-  const priceMatch = query.match(/₹?\s?(\d{3,6})/);
+    console.log("Backend response:", data);
 
-  if (priceMatch) {
-    maxPrice = Number(priceMatch[1]);
+  } catch (error) {
+    console.error("Error connecting to backend:", error);
   }
-
-  // Dietary preference
-  if (query.includes("vegetarian")) {
-    dietaryPreference = "Vegetarian";
-  }
-
-  if (query.includes("vegan")) {
-    dietaryPreference = "Vegan";
-  }
-
-  // Allergens
-  if (query.includes("peanut") || query.includes("peanuts")) {
-    avoidAllergens.push("Peanuts");
-  }
-
-  if (query.includes("milk") || query.includes("lactose")) {
-    avoidAllergens.push("Milk");
-  }
-
-  // Product intent
-  if (query.includes("protein")) {
-    category = "HEALTH & FITNESS";
-    subcategory = "Protein";
-  }
-
-  if (
-    query.includes("headphone") ||
-    query.includes("audio")
-  ) {
-    category = "ELECTRONICS";
-    subcategory = "Audio";
-  }
-
-  if (
-    query.includes("office") ||
-    query.includes("workspace") ||
-    query.includes("desk")
-  ) {
-    category = "LIFESTYLE";
-    subcategory = "Workspace";
-  }
-
-  if (
-    query.includes("gift") ||
-    query.includes("present")
-  ) {
-    category = "GIFTS";
-  }
-
-  const recommendations = filterProducts(products, {
-    maxPrice,
-    category,
-    subcategory,
-    dietaryPreference,
-    avoidAllergens,
-  });
-
-  setSmartRecommendations(recommendations);
 };
 
   const filteredProducts = products.filter((product) => {

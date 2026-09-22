@@ -60,9 +60,10 @@ function AIAssistant({ onQuerySubmit }) {
       </div>
 
 
-      <button
+     <button
   className="assistant-button"
   onClick={() => onQuerySubmit(query)}
+  disabled={!query.trim()}
 >
   Find Products
 </button>
