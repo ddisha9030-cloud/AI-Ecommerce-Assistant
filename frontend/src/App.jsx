@@ -5,30 +5,126 @@ import Hero from "./components/Hero";
 import ProductCard from "./components/ProductCard";
 import CategoryCard from "./components/CategoryCard";
 import Cart from "./components/Cart";
+import { filterProducts } from "./utils/recommendationEngine";
 
 const products = [
   {
     id: 1,
     category: "HEALTH & FITNESS",
+    subcategory: "Protein",
     name: "Plant Protein Powder",
-    description: "High-protein vegetarian formula.",
+    brand: "FitFuel",
+    description: "High-protein vegetarian formula for everyday fitness.",
     price: 1499,
+    rating: 4.4,
+    ingredients: ["Pea Protein", "Brown Rice Protein", "Cocoa"],
+    dietaryTags: ["Vegetarian", "Vegan", "High Protein"],
+    allergens: [],
     image: null,
   },
+
   {
     id: 2,
-    category: "ELECTRONICS",
-    name: "Wireless Headphones",
-    description: "Comfortable everyday audio.",
-    price: 1999,
+    category: "HEALTH & FITNESS",
+    subcategory: "Protein",
+    name: "Whey Protein Chocolate",
+    brand: "MusclePro",
+    description: "Whey protein supplement designed for post-workout recovery.",
+    price: 1899,
+    rating: 4.5,
+    ingredients: ["Whey Protein Concentrate", "Cocoa", "Milk Solids"],
+    dietaryTags: ["High Protein"],
+    allergens: ["Milk"],
     image: null,
   },
+
   {
     id: 3,
+    category: "HEALTH & FITNESS",
+    subcategory: "Snacks",
+    name: "Protein Energy Bars",
+    brand: "NutriGo",
+    description: "Convenient protein-rich snack for active lifestyles.",
+    price: 699,
+    rating: 4.2,
+    ingredients: ["Peanuts", "Oats", "Dates", "Protein Blend"],
+    dietaryTags: ["Vegetarian", "High Protein"],
+    allergens: ["Peanuts"],
+    image: null,
+  },
+
+  {
+    id: 4,
+    category: "ELECTRONICS",
+    subcategory: "Audio",
+    name: "Wireless Headphones",
+    brand: "SoundMax",
+    description: "Comfortable everyday headphones with wireless connectivity.",
+    price: 1999,
+    rating: 4.3,
+    ingredients: [],
+    dietaryTags: [],
+    allergens: [],
+    image: null,
+  },
+
+  {
+    id: 5,
+    category: "ELECTRONICS",
+    subcategory: "Accessories",
+    name: "Wireless Mouse",
+    brand: "TechFlow",
+    description: "Compact wireless mouse for work, study and everyday use.",
+    price: 799,
+    rating: 4.1,
+    ingredients: [],
+    dietaryTags: [],
+    allergens: [],
+    image: null,
+  },
+
+  {
+    id: 6,
     category: "LIFESTYLE",
+    subcategory: "Workspace",
     name: "Minimal Desk Organizer",
+    brand: "WorkSpace",
     description: "Keep your workspace clean and organized.",
     price: 799,
+    rating: 4.6,
+    ingredients: [],
+    dietaryTags: [],
+    allergens: [],
+    image: null,
+  },
+
+  {
+    id: 7,
+    category: "LIFESTYLE",
+    subcategory: "Stationery",
+    name: "Premium Notebook",
+    brand: "PaperCraft",
+    description: "Minimal hardcover notebook for notes, planning and journaling.",
+    price: 499,
+    rating: 4.5,
+    ingredients: [],
+    dietaryTags: [],
+    allergens: [],
+    image: null,
+  },
+
+  {
+    id: 8,
+    category: "GIFTS",
+    subcategory: "Lifestyle",
+    name: "Self Care Gift Set",
+    brand: "GlowBox",
+    description: "A simple self-care collection suitable for gifting.",
+    price: 1299,
+    rating: 4.4,
+    ingredients: [],
+    dietaryTags: [],
+    allergens: [],
     image: null,
   },
 ];
@@ -69,6 +165,82 @@ function App() {
     const [cartItems, setCartItems] = useState([]);
     const [cartOpen, setCartOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("ALL");
+    const [smartRecommendations, setSmartRecommendations] = useState([]);
+
+  const handleAssistantQuery = (userQuery) => {
+  const query = userQuery.toLowerCase();
+
+  let maxPrice = null;
+  let category = null;
+  let subcategory = null;
+  let dietaryPreference = null;
+  let avoidAllergens = [];
+
+  // Budget
+  const priceMatch = query.match(/₹?\s?(\d{3,6})/);
+
+  if (priceMatch) {
+    maxPrice = Number(priceMatch[1]);
+  }
+
+  // Dietary preference
+  if (query.includes("vegetarian")) {
+    dietaryPreference = "Vegetarian";
+  }
+
+  if (query.includes("vegan")) {
+    dietaryPreference = "Vegan";
+  }
+
+  // Allergens
+  if (query.includes("peanut") || query.includes("peanuts")) {
+    avoidAllergens.push("Peanuts");
+  }
+
+  if (query.includes("milk") || query.includes("lactose")) {
+    avoidAllergens.push("Milk");
+  }
+
+  // Product intent
+  if (query.includes("protein")) {
+    category = "HEALTH & FITNESS";
+    subcategory = "Protein";
+  }
+
+  if (
+    query.includes("headphone") ||
+    query.includes("audio")
+  ) {
+    category = "ELECTRONICS";
+    subcategory = "Audio";
+  }
+
+  if (
+    query.includes("office") ||
+    query.includes("workspace") ||
+    query.includes("desk")
+  ) {
+    category = "LIFESTYLE";
+    subcategory = "Workspace";
+  }
+
+  if (
+    query.includes("gift") ||
+    query.includes("present")
+  ) {
+    category = "GIFTS";
+  }
+
+  const recommendations = filterProducts(products, {
+    maxPrice,
+    category,
+    subcategory,
+    dietaryPreference,
+    avoidAllergens,
+  });
+
+  setSmartRecommendations(recommendations);
+};
 
   const filteredProducts = products.filter((product) => {
   const query = searchQuery.toLowerCase();
@@ -172,7 +344,30 @@ const handleDecreaseQuantity = (productId) => {
 
       <main>
 
-       <Hero />
+      <Hero onQuerySubmit={handleAssistantQuery} />
+        {smartRecommendations.length > 0 && (
+  <section className="products-section">
+
+    <div className="section-heading">
+      <div>
+        <p className="section-label">SHOPAI RESULTS</p>
+        <h2>Recommended for you</h2>
+      </div>
+    </div>
+
+    <div className="product-grid">
+      {smartRecommendations.map((product) => (
+        <ProductCard
+          key={product.id}
+          product={product}
+          onAddToCart={handleAddToCart}
+        />
+      ))}
+    </div>
+
+  </section>
+)}
+       
 
 
 {/* ================= CATEGORIES ================= */}

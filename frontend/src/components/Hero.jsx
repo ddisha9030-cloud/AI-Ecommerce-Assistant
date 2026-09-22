@@ -1,5 +1,5 @@
 import AIAssistant from "./AIAssistant";
-function Hero() {
+function Hero({ onQuerySubmit }) {
   return (
     <section className="hero">
 
@@ -43,7 +43,7 @@ function Hero() {
       {/* AI Assistant Preview */}
 
       <div className="assistant-preview">
-        <AIAssistant />
+        <AIAssistant onQuerySubmit={onQuerySubmit} />
 
       </div>
 

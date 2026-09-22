@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function AIAssistant() {
+function AIAssistant({ onQuerySubmit }) {
 
   const [query, setQuery] = useState("");
 
@@ -60,9 +60,12 @@ function AIAssistant() {
       </div>
 
 
-      <button className="assistant-button">
-        Find Products
-      </button>
+      <button
+  className="assistant-button"
+  onClick={() => onQuerySubmit(query)}
+>
+  Find Products
+</button>
 
     </div>
   );
