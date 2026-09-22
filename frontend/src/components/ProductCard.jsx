@@ -1,5 +1,5 @@
 import { useState } from "react";
-function ProductCard({ product }) {
+function ProductCard({ product, onAddToCart }) {
     const [added, setAdded] = useState(false);
   return (
     <div className="product-card">
@@ -32,7 +32,12 @@ function ProductCard({ product }) {
 
           <button
   className="add-button"
-  onClick={() => setAdded(!added)}
+  onClick={() => {
+    if (!added) {
+      onAddToCart(product);
+      setAdded(true);
+    }
+  }}
 >
   {added ? "Added ✓" : "Add"}
 </button>

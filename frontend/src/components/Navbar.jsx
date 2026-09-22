@@ -1,4 +1,9 @@
-function Navbar({ searchQuery, setSearchQuery }) {
+function Navbar({
+  searchQuery,
+  setSearchQuery,
+  cartCount,
+  onCartClick,
+}) {
   return (
     <header className="navbar">
 
@@ -31,9 +36,12 @@ function Navbar({ searchQuery, setSearchQuery }) {
 
         </div>
 
-        <button className="cart-button">
-          Cart <span>0</span>
-        </button>
+        <button
+  className="cart-button"
+  onClick={onCartClick}
+>
+  Cart <span>{cartCount}</span>
+</button>
 
       </div>
 

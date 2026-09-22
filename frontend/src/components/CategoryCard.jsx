@@ -1,7 +1,9 @@
-function CategoryCard({ category }) {
+function CategoryCard({ category, onClick }) {
   return (
-    <div className={`category-card ${category.color}`}>
-
+    <div
+  className={`category-card ${category.color}`}
+  onClick={onClick}
+>
       <div className="category-icon">
         {category.icon}
       </div>
