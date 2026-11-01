@@ -1,133 +1,11 @@
+
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import ProductCard from "./components/ProductCard";
 import CategoryCard from "./components/CategoryCard";
 import Cart from "./components/Cart";
-import { filterProducts } from "./utils/recommendationEngine";
-
-const products = [
-  {
-    id: 1,
-    category: "HEALTH & FITNESS",
-    subcategory: "Protein",
-    name: "Plant Protein Powder",
-    brand: "FitFuel",
-    description: "High-protein vegetarian formula for everyday fitness.",
-    price: 1499,
-    rating: 4.4,
-    ingredients: ["Pea Protein", "Brown Rice Protein", "Cocoa"],
-    dietaryTags: ["Vegetarian", "Vegan", "High Protein"],
-    allergens: [],
-    image: null,
-  },
-
-  {
-    id: 2,
-    category: "HEALTH & FITNESS",
-    subcategory: "Protein",
-    name: "Whey Protein Chocolate",
-    brand: "MusclePro",
-    description: "Whey protein supplement designed for post-workout recovery.",
-    price: 1899,
-    rating: 4.5,
-    ingredients: ["Whey Protein Concentrate", "Cocoa", "Milk Solids"],
-    dietaryTags: ["High Protein"],
-    allergens: ["Milk"],
-    image: null,
-  },
-
-  {
-    id: 3,
-    category: "HEALTH & FITNESS",
-    subcategory: "Snacks",
-    name: "Protein Energy Bars",
-    brand: "NutriGo",
-    description: "Convenient protein-rich snack for active lifestyles.",
-    price: 699,
-    rating: 4.2,
-    ingredients: ["Peanuts", "Oats", "Dates", "Protein Blend"],
-    dietaryTags: ["Vegetarian", "High Protein"],
-    allergens: ["Peanuts"],
-    image: null,
-  },
-
-  {
-    id: 4,
-    category: "ELECTRONICS",
-    subcategory: "Audio",
-    name: "Wireless Headphones",
-    brand: "SoundMax",
-    description: "Comfortable everyday headphones with wireless connectivity.",
-    price: 1999,
-    rating: 4.3,
-    ingredients: [],
-    dietaryTags: [],
-    allergens: [],
-    image: null,
-  },
-
-  {
-    id: 5,
-    category: "ELECTRONICS",
-    subcategory: "Accessories",
-    name: "Wireless Mouse",
-    brand: "TechFlow",
-    description: "Compact wireless mouse for work, study and everyday use.",
-    price: 799,
-    rating: 4.1,
-    ingredients: [],
-    dietaryTags: [],
-    allergens: [],
-    image: null,
-  },
-
-  {
-    id: 6,
-    category: "LIFESTYLE",
-    subcategory: "Workspace",
-    name: "Minimal Desk Organizer",
-    brand: "WorkSpace",
-    description: "Keep your workspace clean and organized.",
-    price: 799,
-    rating: 4.6,
-    ingredients: [],
-    dietaryTags: [],
-    allergens: [],
-    image: null,
-  },
-
-  {
-    id: 7,
-    category: "LIFESTYLE",
-    subcategory: "Stationery",
-    name: "Premium Notebook",
-    brand: "PaperCraft",
-    description: "Minimal hardcover notebook for notes, planning and journaling.",
-    price: 499,
-    rating: 4.5,
-    ingredients: [],
-    dietaryTags: [],
-    allergens: [],
-    image: null,
-  },
-
-  {
-    id: 8,
-    category: "GIFTS",
-    subcategory: "Lifestyle",
-    name: "Self Care Gift Set",
-    brand: "GlowBox",
-    description: "A simple self-care collection suitable for gifting.",
-    price: 1299,
-    rating: 4.4,
-    ingredients: [],
-    dietaryTags: [],
-    allergens: [],
-    image: null,
-  },
-];
 
 const categories = [
   {
@@ -161,240 +39,288 @@ const categories = [
 ];
 
 function App() {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [cartItems, setCartItems] = useState([]);
-    const [cartOpen, setCartOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState("ALL");
-    const [smartRecommendations, setSmartRecommendations] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [cartItems, setCartItems] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
+  const [smartRecommendations, setSmartRecommendations] = useState([]);
 
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Fetch products from PostgreSQL through FastAPI
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/products"
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        const data = await response.json();
+
+        const formattedProducts = data.map((product) => ({
+          id: product.product_id,
+          name: product.name,
+          brand: product.brand,
+          category: ["FITNESS", "FOOD"].includes(
+            product.category.toUpperCase()
+          )
+            ? "HEALTH & FITNESS"
+            : product.category.toUpperCase(),
+          subcategory: product.category,
+          description: product.description || "",
+          price: Number(product.price),
+          rating: 4.5,
+          ingredients: product.ingredients
+            ? product.ingredients.split(",").map((item) => item.trim())
+            : [],
+          dietaryTags: [],
+          allergens:
+            product.allergens &&
+            product.allergens.toLowerCase() !== "none declared"
+              ? [product.allergens]
+              : [],
+          image: null,
+        }));
+
+        setProducts(formattedProducts);
+        setError("");
+      } catch (err) {
+        setError("Unable to load products. Please check the backend.");
+        console.error("Product loading error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Send user query to the backend
   const handleAssistantQuery = async (userQuery) => {
-  try {
-    const response = await fetch("http://127.0.0.1:8000/api/assistant", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: userQuery,
-      }),
-    });
-
-    const data = await response.json();
-
-    console.log("Backend response:", data);
-
-  } catch (error) {
-    console.error("Error connecting to backend:", error);
-  }
-};
-
-  const filteredProducts = products.filter((product) => {
-  const query = searchQuery.toLowerCase();
-
-  const matchesSearch =
-    product.name.toLowerCase().includes(query) ||
-    product.category.toLowerCase().includes(query) ||
-    product.description.toLowerCase().includes(query);
-
-  const matchesCategory =
-    selectedCategory === "ALL" ||
-    product.category === selectedCategory;
-
-  return matchesSearch && matchesCategory;
-});
-const handleAddToCart = (product) => {
-  setCartItems((currentItems) => {
-
-    const existingProduct = currentItems.find(
-      (item) => item.id === product.id
-    );
-
-    if (existingProduct) {
-      return currentItems.map((item) =>
-        item.id === product.id
-          ? {
-              ...item,
-              quantity: item.quantity + 1,
-            }
-          : item
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/assistant",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: userQuery,
+          }),
+        }
       );
+
+      const data = await response.json();
+
+      console.log("Backend response:", data);
+    } catch (error) {
+      console.error("Error connecting to backend:", error);
     }
+  };
 
-    return [
-      ...currentItems,
-      {
-        ...product,
-        quantity: 1,
-      },
-    ];
+  // Search and category filtering
+  const filteredProducts = products.filter((product) => {
+    const query = searchQuery.toLowerCase();
+
+    const matchesSearch =
+      product.name.toLowerCase().includes(query) ||
+      product.category.toLowerCase().includes(query) ||
+      product.description.toLowerCase().includes(query) ||
+      (product.brand || "").toLowerCase().includes(query);
+
+    const matchesCategory =
+      selectedCategory === "ALL" ||
+      product.category === selectedCategory;
+
+    return matchesSearch && matchesCategory;
   });
-};
 
-const handleRemoveFromCart = (indexToRemove) => {
-  setCartItems((currentItems) =>
-    currentItems.filter((_, index) => index !== indexToRemove)
-  );
-};
+  // Add product to cart
+  const handleAddToCart = (product) => {
+    setCartItems((currentItems) => {
+      const existingProduct = currentItems.find(
+        (item) => item.id === product.id
+      );
 
-const handleIncreaseQuantity = (productId) => {
-  setCartItems((currentItems) =>
-    currentItems.map((item) =>
-      item.id === productId
-        ? {
-            ...item,
-            quantity: item.quantity + 1,
-          }
-        : item
-    )
-  );
-};
+      if (existingProduct) {
+        return currentItems.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
 
-const handleDecreaseQuantity = (productId) => {
-  setCartItems((currentItems) =>
-    currentItems
-      .map((item) =>
+      return [
+        ...currentItems,
+        {
+          ...product,
+          quantity: 1,
+        },
+      ];
+    });
+  };
+
+  // Remove product from cart
+  const handleRemoveFromCart = (indexToRemove) => {
+    setCartItems((currentItems) =>
+      currentItems.filter((_, index) => index !== indexToRemove)
+    );
+  };
+
+  // Increase product quantity
+  const handleIncreaseQuantity = (productId) => {
+    setCartItems((currentItems) =>
+      currentItems.map((item) =>
         item.id === productId
-          ? {
-              ...item,
-              quantity: item.quantity - 1,
-            }
+          ? { ...item, quantity: item.quantity + 1 }
           : item
       )
-      .filter((item) => item.quantity > 0)
-  );
-};
+    );
+  };
+
+  // Decrease product quantity
+  const handleDecreaseQuantity = (productId) => {
+    setCartItems((currentItems) =>
+      currentItems
+        .map((item) =>
+          item.id === productId
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  };
 
   return (
     <div className="app">
+      {/* NAVBAR */}
+      <Navbar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        cartCount={cartItems.reduce(
+          (total, item) => total + item.quantity,
+          0
+        )}
+        onCartClick={() => setCartOpen(true)}
+      />
 
-      {/* ================= NAVBAR ================= */}
-
-   <Navbar
-  searchQuery={searchQuery}
-  setSearchQuery={setSearchQuery}
-  cartCount={cartItems.length}
-  onCartClick={() => setCartOpen(true)}
-/>
-
-{cartOpen && (
-  <Cart
-  cartItems={cartItems}
-  onRemove={handleRemoveFromCart}
-  onIncrease={handleIncreaseQuantity}
-  onDecrease={handleDecreaseQuantity}
-  onClose={() => setCartOpen(false)}
-/>
-)}
-
-      {/* ================= HERO ================= */}
+      {/* CART */}
+      {cartOpen && (
+        <Cart
+          cartItems={cartItems}
+          onRemove={handleRemoveFromCart}
+          onIncrease={handleIncreaseQuantity}
+          onDecrease={handleDecreaseQuantity}
+          onClose={() => setCartOpen(false)}
+        />
+      )}
 
       <main>
+        {/* HERO */}
+        <Hero onQuerySubmit={handleAssistantQuery} />
 
-      <Hero onQuerySubmit={handleAssistantQuery} />
+        {/* SMART RECOMMENDATIONS */}
         {smartRecommendations.length > 0 && (
-  <section className="products-section">
+          <section className="products-section">
+            <div className="section-heading">
+              <div>
+                <p className="section-label">SHOPAI RESULTS</p>
+                <h2>Recommended for you</h2>
+              </div>
+            </div>
 
-    <div className="section-heading">
-      <div>
-        <p className="section-label">SHOPAI RESULTS</p>
-        <h2>Recommended for you</h2>
-      </div>
-    </div>
+            <div className="product-grid">
+              {smartRecommendations.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onAddToCart={handleAddToCart}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
-    <div className="product-grid">
-      {smartRecommendations.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-          onAddToCart={handleAddToCart}
-        />
-      ))}
-    </div>
-
-  </section>
-)}
-       
-
-
-{/* ================= CATEGORIES ================= */}
-
-<section className="section">
-
-  <div className="section-heading">
-
-    <div>
-      <p className="section-label">EXPLORE CATEGORIES</p>
-      <h2>Shop by category</h2>
-    </div>
-
-    <button
-  className="view-button"
-  onClick={() => {
-    setSelectedCategory("ALL");
-    setSearchQuery("");
-  }}
->
-  View all
-</button>
-
-  </div>
-
-
-  <div className="category-grid">
-
-    {categories.map((category) => (
-  <CategoryCard
-    key={category.id}
-    category={category}
-    onClick={() => setSelectedCategory(category.name.toUpperCase())}
-  />
-))}
-
-  </div>
-
-</section>
-
-
-{/* ================= RECOMMENDATIONS ================= */}
-
-<section className="recommendations section">
-
+        {/* CATEGORIES */}
+        <section className="section">
           <div className="section-heading">
+            <div>
+              <p className="section-label">EXPLORE CATEGORIES</p>
+              <h2>Shop by category</h2>
+            </div>
 
+            <button
+              className="view-button"
+              onClick={() => {
+                setSelectedCategory("ALL");
+                setSearchQuery("");
+              }}
+            >
+              View all
+            </button>
+          </div>
+
+          <div className="category-grid">
+            {categories.map((category) => (
+              <CategoryCard
+                key={category.id}
+                category={category}
+                onClick={() =>
+                  setSelectedCategory(category.name.toUpperCase())
+                }
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* PRODUCTS */}
+        <section className="recommendations section">
+          <div className="section-heading">
             <div>
               <p className="section-label">PERSONALIZED FOR YOU</p>
               <h2>Recommended products</h2>
             </div>
 
-            <button className="view-button">
+            <button
+              className="view-button"
+              onClick={() => {
+                setSelectedCategory("ALL");
+                setSearchQuery("");
+              }}
+            >
               See more
             </button>
-
           </div>
-
 
           <div className="product-grid">
-{filteredProducts.map((product) => (
-  <ProductCard
-    key={product.id}
-    product={product}
-    onAddToCart={handleAddToCart}
-  />
-))}
-
-            
-
+            {loading ? (
+              <p>Loading products...</p>
+            ) : error ? (
+              <p>{error}</p>
+            ) : filteredProducts.length === 0 ? (
+              <p>No products found.</p>
+            ) : (
+              filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onAddToCart={handleAddToCart}
+                />
+              ))
+            )}
           </div>
-
         </section>
-
       </main>
 
-
-      {/* ================= FOOTER ================= */}
-
+      {/* FOOTER */}
       <footer className="footer">
-
         <div className="logo footer-logo">
           <span className="logo-mark"></span>
           ShopAI
@@ -403,12 +329,9 @@ const handleDecreaseQuantity = (productId) => {
         <p>
           Personalized shopping powered by intelligent recommendations.
         </p>
-
       </footer>
-
     </div>
   );
 }
 
 export default App;
-
