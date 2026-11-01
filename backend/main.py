@@ -1,3 +1,4 @@
+from recommendation_engine import recommend_products
 from schemas import ProductCreate, ProductUpdate
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -124,3 +125,59 @@ def delete_product(
     db.commit()
 
     return {"message": "Product deleted successfully"}
+
+@app.post("/api/recommend")
+def get_recommendations(
+    request: dict,
+    db: Session = Depends(get_db)
+):
+    user_query = request.get("query", "")
+
+    products = db.query(Product).all()
+
+    recommended = recommend_products(products, user_query)
+
+    return [
+        {
+            "product_id": product.product_id,
+            "name": product.name,
+            "brand": product.brand,
+            "category": product.category,
+            "price": product.price,
+            "description": product.description,
+            "allergens": product.allergens
+        }
+        for product in recommended
+    ]
+
+
+@app.post("/api/check-allergens")
+def check_allergens(request: dict, db: Session = Depends(get_db)):
+    avoided_allergens = request.get("allergens", [])
+
+    products = db.query(Product).all()
+    results = []
+
+    for product in products:
+        product_allergens = (product.allergens or "").lower()
+        ingredients = (product.ingredients or "").lower()
+
+        matched = [
+            allergen for allergen in avoided_allergens
+            if allergen.lower() in product_allergens
+            or allergen.lower() in ingredients
+        ]
+
+        results.append({
+            "product_id": product.product_id,
+            "name": product.name,
+            "warning": len(matched) > 0,
+            "matched_allergens": matched,
+            "message": (
+                "Potential allergen match found."
+                if matched
+                else "No matching allergen was found in the listed information."
+            )
+        })
+
+    return results
