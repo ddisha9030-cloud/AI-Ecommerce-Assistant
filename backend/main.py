@@ -1,3 +1,5 @@
+from hybrid_engine import hybrid_recommendations
+from models import Product, UserInteraction
 from recommendation_engine import recommend_products
 from schemas import ProductCreate, ProductUpdate
 from fastapi import FastAPI, Depends
@@ -5,7 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from database import SessionLocal
-from models import Product
 
 app = FastAPI()
 
@@ -181,3 +182,101 @@ def check_allergens(request: dict, db: Session = Depends(get_db)):
         })
 
     return results
+
+
+@app.post("/api/interactions")
+def record_interaction(
+    request: dict,
+    db: Session = Depends(get_db)
+):
+    user_id = request.get("user_id")
+    product_id = request.get("product_id")
+    interaction_type = request.get("interaction_type", "").lower()
+
+    if not user_id or not product_id:
+        return {"message": "User ID and product ID are required"}
+
+    if interaction_type not in ["view", "cart", "purchase"]:
+        return {"message": "Invalid interaction type"}
+
+    product = db.query(Product).filter(
+        Product.product_id == product_id
+    ).first()
+
+    if not product:
+        return {"message": "Product not found"}
+
+    interaction = UserInteraction(
+        user_id=user_id,
+        product_id=product_id,
+        interaction_type=interaction_type
+    )
+
+    db.add(interaction)
+    db.commit()
+    db.refresh(interaction)
+
+    return {
+        "message": "Interaction recorded successfully",
+        "interaction_id": interaction.interaction_id,
+        "user_id": interaction.user_id,
+        "product_id": interaction.product_id,
+        "interaction_type": interaction.interaction_type
+    }
+
+
+@app.get("/api/interactions/{user_id}")
+def get_user_interactions(
+    user_id: str,
+    db: Session = Depends(get_db)
+):
+    interactions = db.query(UserInteraction).filter(
+        UserInteraction.user_id == user_id
+    ).order_by(
+        UserInteraction.created_at.desc()
+    ).all()
+
+    return [
+        {
+            "interaction_id": item.interaction_id,
+            "user_id": item.user_id,
+            "product_id": item.product_id,
+            "interaction_type": item.interaction_type,
+            "created_at": item.created_at
+        }
+        for item in interactions
+    ]
+
+
+@app.post("/api/hybrid-recommend")
+def get_hybrid_recommendations(
+    request: dict,
+    db: Session = Depends(get_db)
+):
+    user_id = request.get("user_id")
+    query = request.get("query", "")
+
+    if not user_id:
+        return {"message": "User ID is required"}
+
+    products = db.query(Product).all()
+    interactions = db.query(UserInteraction).all()
+
+    recommended = hybrid_recommendations(
+        products,
+        interactions,
+        user_id,
+        query
+    )
+
+    return [
+        {
+            "product_id": product.product_id,
+            "name": product.name,
+            "brand": product.brand,
+            "category": product.category,
+            "price": product.price,
+            "description": product.description
+        }
+        for product in recommended
+    ]

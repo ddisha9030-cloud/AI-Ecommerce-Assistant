@@ -1,6 +1,6 @@
 from database import engine, Base
-from models import Product
+from models import Product, UserInteraction
 
 Base.metadata.create_all(bind=engine)
 
-print("Product table created successfully!")
+print("Database tables created successfully!")

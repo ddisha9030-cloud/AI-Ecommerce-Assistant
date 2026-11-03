@@ -981,3 +981,550 @@
   font-size: 13px;
   font-weight: 600;
 }
+
+
+/* =========================================
+   SHOPAI — MOCHA / PLATINUM / LAVENDER THEME
+========================================= */
+
+:root {
+  --mocha: #765447;
+  --mocha-dark: #49372F;
+  --mocha-light: #A58A7D;
+
+  --platinum: #D5D5D8;
+  --platinum-light: #E9E9EB;
+
+  --lavender: #E8E1F1;
+  --lavender-deep: #B7A9C9;
+
+  --ivory: #F7F5F2;
+  --white: #FFFFFF;
+
+  --text-main: #352D2A;
+  --text-muted: #827873;
+  --border: #E4DFDC;
+}
+
+/* GLOBAL */
+
+.app {
+  background: var(--ivory);
+  color: var(--text-main);
+}
+
+body {
+  background: var(--ivory);
+  color: var(--text-main);
+}
+
+/* NAVBAR */
+
+.navbar {
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--platinum);
+}
+
+.logo {
+  color: var(--mocha-dark);
+}
+
+.logo-mark {
+  background: var(--lavender-deep);
+}
+
+.nav-links a {
+  color: var(--text-muted);
+}
+
+.nav-links a:hover {
+  color: var(--mocha);
+}
+
+.search-box,
+.cart-button {
+  border-color: var(--border);
+  background: var(--white);
+}
+
+.search-box input {
+  color: var(--text-main);
+}
+
+.search-box button {
+  background: var(--mocha);
+  color: var(--white);
+}
+
+.search-box button:hover {
+  background: var(--mocha-dark);
+}
+
+.cart-button {
+  color: var(--mocha-dark);
+}
+
+.cart-button span {
+  background: var(--lavender);
+  color: var(--mocha-dark);
+}
+
+/* HERO */
+
+.hero {
+  background:
+    radial-gradient(
+      circle at 85% 70%,
+      rgba(232, 225, 241, 0.8),
+      transparent 35%
+    ),
+    var(--ivory);
+}
+
+.eyebrow,
+.section-label {
+  color: var(--mocha);
+}
+
+.hero h1 {
+  color: var(--mocha-dark);
+}
+
+.hero h1 span {
+  color: var(--lavender-deep);
+}
+
+.hero-description,
+.hero-note {
+  color: var(--text-muted);
+}
+
+.primary-button,
+.add-button {
+  background: var(--mocha);
+  color: var(--white);
+}
+
+.primary-button:hover,
+.add-button:hover {
+  background: var(--mocha-dark);
+}
+
+.secondary-button,
+.view-button {
+  background: var(--white);
+  border-color: var(--platinum);
+  color: var(--mocha-dark);
+}
+
+/* AI ASSISTANT */
+
+.assistant-preview {
+  background: var(--white);
+  border-color: var(--platinum);
+  box-shadow: 0 18px 40px rgba(73, 55, 47, 0.08);
+}
+
+.assistant-preview::before {
+  background: var(--lavender);
+  border-color: var(--lavender-deep);
+}
+
+.assistant-header {
+  border-bottom-color: var(--platinum-light);
+}
+
+.assistant-header p {
+  color: var(--mocha);
+}
+
+.assistant-header h3 {
+  color: var(--mocha-dark);
+}
+
+.status-dot {
+  background: #8C9C87;
+}
+
+.assistant-message {
+  color: var(--text-muted);
+}
+
+.assistant-input input {
+  border-color: var(--border);
+  color: var(--text-main);
+}
+
+.assistant-input input:focus {
+  border-color: var(--lavender-deep);
+}
+
+.suggestion {
+  background: var(--ivory);
+  border-color: var(--border);
+  color: var(--text-main);
+}
+
+.suggestion:hover {
+  background: var(--lavender);
+  border-color: var(--lavender-deep);
+}
+
+.assistant-button,
+.checkout-button {
+  background: var(--mocha);
+  color: var(--white);
+}
+
+.assistant-button:hover,
+.checkout-button:hover {
+  background: var(--mocha-dark);
+}
+
+/* SECTIONS */
+
+.categories {
+  background: var(--white);
+}
+
+.recommendations {
+  background: var(--ivory);
+}
+
+.section-heading h2 {
+  color: var(--mocha-dark);
+}
+
+/* CATEGORY CARDS */
+
+.category-pink {
+  background: #E8E1F1;
+  color: var(--mocha-dark);
+}
+
+.category-yellow {
+  background: #D5D5D8;
+  color: var(--mocha-dark);
+}
+
+.category-cream {
+  background: #EEE7E1;
+  color: var(--mocha-dark);
+}
+
+.category-dark {
+  background: var(--mocha-dark);
+  color: var(--white);
+}
+
+/* PRODUCT CARDS */
+
+.product-card {
+  background: var(--white);
+  border-color: var(--border);
+}
+
+.product-card:hover {
+  box-shadow: 0 15px 35px rgba(73, 55, 47, 0.09);
+}
+
+.product-pink {
+  background: #E8E1F1;
+}
+
+.product-yellow {
+  background: #E5E4E5;
+}
+
+.product-cream {
+  background: #EEE7E1;
+}
+
+.product-category {
+  color: var(--mocha);
+}
+
+.product-info h3,
+.product-bottom strong {
+  color: var(--mocha-dark);
+}
+
+.product-description {
+  color: var(--text-muted);
+}
+
+/* FOOTER */
+
+.footer {
+  background: var(--mocha-dark);
+  color: var(--white);
+}
+
+.footer-logo .logo-mark {
+  background: var(--lavender-deep);
+}
+
+/* CART */
+
+.cart-panel {
+  background: var(--ivory);
+  border-left-color: var(--platinum);
+  box-shadow: -12px 0 35px rgba(73, 55, 47, 0.12);
+}
+
+.cart-header {
+  border-bottom-color: var(--platinum);
+}
+
+.cart-header h2 {
+  color: var(--mocha-dark);
+}
+
+.cart-close {
+  border-color: var(--platinum);
+  color: var(--mocha-dark);
+}
+
+.cart-close:hover {
+  background: var(--lavender);
+  border-color: var(--lavender-deep);
+}
+
+.cart-item {
+  background: var(--white);
+  border-color: var(--border);
+}
+
+.cart-item h3 {
+  color: var(--mocha-dark);
+}
+
+.cart-item p,
+.cart-total span {
+  color: var(--text-muted);
+}
+
+.remove-button {
+  color: var(--mocha);
+}
+
+.remove-button:hover {
+  color: var(--mocha-dark);
+}
+
+.empty-cart span {
+  color: var(--text-muted);
+}
+
+.cart-footer {
+  border-top-color: var(--platinum);
+}
+
+.cart-total strong {
+  color: var(--mocha-dark);
+}
+
+/* QUANTITY CONTROLS */
+
+.quantity-button {
+  border-color: var(--platinum);
+  color: var(--mocha-dark);
+}
+
+.quantity-button:hover {
+  background: var(--lavender);
+  border-color: var(--lavender-deep);
+}
+
+.quantity-value {
+  color: var(--mocha-dark);
+}
+
+/* INPUT AND BUTTON TRANSITIONS */
+
+button,
+a,
+input {
+  transition: background 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease;
+}
+
+/* RESPONSIVE CART */
+
+@media (max-width: 600px) {
+  .cart-panel {
+    background: var(--ivory);
+  }
+}
+
+/* =========================================
+   SHOPAI — EDITORIAL TYPOGRAPHY
+========================================= */
+
+body,
+button,
+input {
+  font-family: "DM Sans", sans-serif;
+}
+
+h1,
+h2,
+h3,
+.logo,
+.footer-logo {
+  font-family: "Cormorant Garamond", serif;
+}
+
+.hero h1 {
+  font-size: clamp(54px, 6vw, 78px);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -2px;
+}
+
+.section-heading h2 {
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: -0.7px;
+}
+
+.product-info h3,
+.category-card h3 {
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.logo {
+  font-size: 31px;
+  font-weight: 600;
+  letter-spacing: -1.2px;
+}
+
+.footer-logo {
+  font-size: 28px;
+  font-weight: 500;
+}
+
+
+/* =========================================
+   SHOPAI — WARMER MOCHA REFINEMENT
+========================================= */
+
+/* Warmer overall background */
+.app {
+  background: #F3EEE9;
+}
+
+/* Navbar */
+.navbar {
+  background: #FBF8F5;
+  border-bottom: 1px solid #D5C9C1;
+}
+
+.logo {
+  color: #49372F;
+}
+
+/* Hero section */
+.hero {
+  background:
+    radial-gradient(
+      circle at 85% 60%,
+      rgba(183, 169, 201, 0.22),
+      transparent 35%
+    ),
+    linear-gradient(
+      110deg,
+      #F4EEE9 0%,
+      #EAE0D9 100%
+    );
+}
+
+/* Main heading */
+.hero h1 {
+  color: #49372F;
+}
+
+.hero h1 span {
+  color: #A58A9F;
+}
+
+/* Assistant panel */
+.assistant-preview {
+  background: #E5D9D1;
+  border: 1px solid #C7B5AA;
+  box-shadow: 0 20px 45px rgba(73, 55, 47, 0.13);
+}
+
+.assistant-preview::before {
+  background: #B49A8C;
+  border-color: #A58A7D;
+}
+
+/* Assistant heading */
+.assistant-header h3 {
+  color: #49372F;
+}
+
+.assistant-header p {
+  color: #765447;
+}
+
+/* Assistant suggestions */
+.suggestion {
+  background: #F7F3EF;
+  border-color: #D7C9C0;
+}
+
+.suggestion:hover {
+  background: #E8E1F1;
+  border-color: #B7A9C9;
+}
+
+/* Primary buttons */
+.primary-button,
+.assistant-button,
+.add-button,
+.checkout-button,
+.search-box button {
+  background: #765447;
+  color: #FFFFFF;
+}
+
+.primary-button:hover,
+.assistant-button:hover,
+.add-button:hover,
+.checkout-button:hover,
+.search-box button:hover {
+  background: #49372F;
+}
+
+/* Category and product sections */
+.categories {
+  background: #FBF8F5;
+}
+
+.recommendations {
+  background: #F3EEE9;
+}
+
+/* Product cards */
+.product-card {
+  border-color: #D8CCC4;
+  background: #FBF8F5;
+}
+
+/* Metallic-inspired borders */
+.search-box,
+.cart-button,
+.secondary-button,
+.view-button {
+  border-color: #C8C1C0;
+}
+
+/* Footer */
+.footer {
+  background: #49372F;
+}

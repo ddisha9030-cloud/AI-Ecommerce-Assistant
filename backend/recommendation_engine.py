@@ -1,39 +1,43 @@
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+
 def recommend_products(products, query):
-    query = query.lower()
+    if not products or not query.strip():
+        return []
 
-    keywords = {
-        "protein": ["protein", "fitness", "gym", "workout"],
-        "fitness": ["fitness", "gym", "exercise", "workout"],
-        "food": ["food", "snack", "eat", "butter"],
-        "electronics": ["electronics", "headphones", "mouse", "gadgets"],
-        "gift": ["gift", "birthday", "present", "surprise"],
-        "lifestyle": ["lifestyle", "daily use", "organizer"]
-    }
-
-    matched_products = []
+    product_descriptions = []
 
     for product in products:
-        score = 0
-
-        product_text = " ".join([
+        description = " ".join([
             product.name or "",
+            product.brand or "",
             product.category or "",
             product.description or "",
-            product.brand or ""
-        ]).lower()
+            product.ingredients or ""
+        ])
+        product_descriptions.append(description)
 
-        if any(word in product_text for word in query.split()):
-            score += 2
+    vectorizer = TfidfVectorizer(stop_words="english")
 
-        for category, words in keywords.items():
-            if any(word in query for word in words):
-                if category in product_text:
-                    score += 3
+    product_vectors = vectorizer.fit_transform(product_descriptions)
+    query_vector = vectorizer.transform([query])
 
-        if score > 0:
-            matched_products.append((score, product))
+    similarity_scores = cosine_similarity(
+        query_vector,
+        product_vectors
+    ).flatten()
 
-    matched_products.sort(key=lambda item: item[0], reverse=True)
+    ranked_indices = similarity_scores.argsort()[::-1]
 
-    return [product for score, product in matched_products[:5]]
+    recommendations = []
+
+    for index in ranked_indices:
+        if similarity_scores[index] > 0:
+            recommendations.append(products[index])
+
+        if len(recommendations) == 5:
+            break
+
+    return recommendations

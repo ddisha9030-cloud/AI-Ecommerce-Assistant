@@ -1,3 +1,4 @@
+from sqlalchemy import ForeignKey, DateTime, func
 from sqlalchemy import Column, Integer, String, Text, Numeric, CheckConstraint
 from database import Base
 
@@ -18,4 +19,24 @@ class Product(Base):
     __table_args__ = (
         CheckConstraint("price >= 0", name="check_product_price"),
         CheckConstraint("stock >= 0", name="check_product_stock"),
+    )
+
+    
+class UserInteraction(Base):
+    __tablename__ = "user_interactions"
+
+    interaction_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String(100), nullable=False)
+
+    product_id = Column(
+        Integer,
+        ForeignKey("products.product_id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    interaction_type = Column(String(30), nullable=False)
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
     )
