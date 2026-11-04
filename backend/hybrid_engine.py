@@ -3,7 +3,14 @@ from recommendation_engine import recommend_products
 from collaborative_engine import collaborative_recommendations
 
 
-def hybrid_recommendations(products, interactions, user_id, query):
+def hybrid_recommendations(
+    products,
+    interactions,
+    user_id,
+    query,
+    content_weight=0.7,
+    collaborative_weight=0.3
+):
 
     content_results = recommend_products(products, query)
 
@@ -15,16 +22,18 @@ def hybrid_recommendations(products, interactions, user_id, query):
 
     scores = {}
 
-    # Content-based ranking: 70%
+    # Content-based ranking
     for rank, product in enumerate(content_results):
         scores[product.product_id] = (
-            scores.get(product.product_id, 0) + 0.7 / (rank + 1)
+            scores.get(product.product_id, 0)
+            + content_weight / (rank + 1)
         )
 
-    # Collaborative ranking: 30%
+    # Collaborative ranking
     for rank, product in enumerate(collaborative_results):
         scores[product.product_id] = (
-            scores.get(product.product_id, 0) + 0.3 / (rank + 1)
+            scores.get(product.product_id, 0)
+            + collaborative_weight / (rank + 1)
         )
 
     product_lookup = {
